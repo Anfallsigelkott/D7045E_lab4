@@ -1,4 +1,4 @@
-class monochromeMaterial extends material {
+class MonochromeMaterial extends Material {
     constructor(webGL, shaderPgm, colour){
         super(webGL, shaderPgm);
         this.shaderPgm = shaderPgm;

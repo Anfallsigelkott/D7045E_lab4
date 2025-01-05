@@ -1,4 +1,4 @@
-class cuboid extends Mesh {
+class Cuboid extends Mesh {
     constructor(webGL, height, depth, width, shaderPgm){
         let x = width/2;
         let y = height/2;
@@ -22,8 +22,9 @@ class cuboid extends Mesh {
         // Each set of three elements constitute a triangle, two triangles (six elements) make a face
         // Starting from bottom face, then clockwise starting from the "closest" face, and lastly the top face
         // Each element represents the index of a vertex in vertices
+        let normals = [];
 
-        super(webGL, vertices.flat(), indices, shaderPgm);
+        super(webGL, vertices.flat(), indices, normals, shaderPgm);
         this.x = x;
         this.y = y;
         this.z = z;

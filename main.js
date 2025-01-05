@@ -39,12 +39,13 @@ function init(){
     let reference = [0, 0, 0];
     camera = new Camera(eye, reference, 1.7853981634, (canvas.width/canvas.height), 1, 100, shaderPgm, webGL);
     
-    let blueMono = new monochromeMaterial(webGL, shaderPgm, [0, 0.3, 1, 1.0]);
-    let greenMono = new monochromeMaterial(webGL, shaderPgm, [0.28, 0.74, 0.15, 1.0]);
+    let blueMono = new MonochromeMaterial(webGL, shaderPgm, [0, 0.3, 1, 1.0]);
+    let greenMono = new MonochromeMaterial(webGL, shaderPgm, [0.28, 0.74, 0.15, 1.0]);
 
-    let playerCube = new cuboid(webGL, 0.4, 0.2, 0.6, shaderPgm);
+    let playerCube = new Cuboid(webGL, 0.4, 0.2, 0.6, shaderPgm);
+    let playerCone = new Cone(webGL, 1, 0.5, shaderPgm);
     let playerMatrix = [1,0,0,0, 0,1,0,0, 0,0,1,-1, 0,0,0,1]; // Identity matrix
-    player = new GraphicsNode(playerCube, blueMono, playerMatrix, webGL);
+    player = new GraphicsNode(playerCone, blueMono, playerMatrix, webGL);
     
 
     let min = -1.5;
@@ -59,8 +60,8 @@ function init(){
         mat4.translate(matrix, matrix, [x, y, z]);
         console.log(matrix);
         //let matrix = [0, 0, 0, x,   0, 0, 0, y,  0, 0, 0, z,  0, 0, -1, 4];
-        let newObject = new GraphicsNode(playerCube, greenMono, matrix, webGL);
-        graphicsObjects.push(newObject);
+        //let newObject = new GraphicsNode(playerCube, greenMono, matrix, webGL);
+        //graphicsObjects.push(newObject);
     }
 
     draw();
