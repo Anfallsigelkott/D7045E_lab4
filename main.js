@@ -37,15 +37,19 @@ function init(){
 
     let eye = [0, 0, 5];
     let reference = [0, 0, 0];
-    camera = new Camera(eye, reference, 1.7853981634, (canvas.width/canvas.height), 1, 100, shaderPgm, webGL);
+    camera = new Camera(eye, reference, 0.7853981634, (canvas.width/canvas.height), 1, 100, shaderPgm, webGL);
     
     let blueMono = new MonochromeMaterial(webGL, shaderPgm, [0, 0.3, 1, 1.0]);
     let greenMono = new MonochromeMaterial(webGL, shaderPgm, [0.28, 0.74, 0.15, 1.0]);
 
     let playerCube = new Cuboid(webGL, 0.4, 0.2, 0.6, shaderPgm);
     let playerCone = new Cone(webGL, 1, 0.5, shaderPgm);
+    let playerTorus = new Torus(webGL, 0.5/3, 0.5, shaderPgm);
+    let playerCylinder = new Cylinder(webGL, 0.5, 0.7, shaderPgm);
+    let playerSphere = new Sphere(webGL, 0.5, shaderPgm);
+    let playerStar = new Star(webGL, 1, 0.5, 0.5, 15);
     let playerMatrix = [1,0,0,0, 0,1,0,0, 0,0,1,-1, 0,0,0,1]; // Identity matrix
-    player = new GraphicsNode(playerCone, blueMono, playerMatrix, webGL);
+    player = new GraphicsNode(playerStar, blueMono, playerMatrix, webGL, shaderPgm);
     
 
     let min = -1.5;
@@ -69,6 +73,8 @@ function init(){
 
 function draw() {
     webGL.clear(webGL.COLOR_BUFFER_BIT);
+    shaderPgm.activate();
+    //camera.update([5, 0, 5], [0, 0, 0]);
 
     for (let i = 0; i < graphicsObjects.length; i++) {
         graphicsObjects[i].draw();
@@ -79,6 +85,7 @@ function draw() {
 
 window.addEventListener("keydown", function(event) {
     let xyz = [0,0,0];
+    let cameraPos = camera.getEyePos();
     const speed = 0.1;
     switch (event.key) {
         case "w":
@@ -99,9 +106,24 @@ window.addEventListener("keydown", function(event) {
         case "c":
             xyz[2] = xyz[2] - speed;
             break;
+        case "ArrowUp":
+            console.log("HERE!");
+            cameraPos[1] = cameraPos[1] + speed;
+            break;
+        case "ArrowDown":
+            cameraPos[1] = cameraPos[1] - speed;
+            break;
+        case "ArrowLeft":
+            cameraPos[0] = cameraPos[0] - speed;
+            break;
+        case "ArrowRight":
+            cameraPos[0] = cameraPos[0] + speed;
+            break;
     }
+    console.log(cameraPos);
     player.update(xyz);
-    console.log(player.transform);
+    camera.update(cameraPos, [0, 0, 0]);
+    //console.log(player.transform);
     draw();
 });
 

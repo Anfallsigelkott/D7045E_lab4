@@ -1,19 +1,44 @@
 class Camera {
     constructor(eyeVec, refVec, FOVRad, aspectRatio, near, far, shaderProgram, webGL) {
         this.webGL = webGL;
+        this.shaderProgram = shaderProgram;
+        this.FOVRad = FOVRad;
+        this.aspectRatio = aspectRatio;
+        this.near = near;
+        this.far = far;
+        this.eyeVec = eyeVec;
+        this.refVec = refVec;
 
-        let upVec = [0.0, 1.0, 0.0];
+        this.upVec = [0.0, 1.0, 0.0];
         this.viewMatrix = mat4.create();
-        mat4.lookAt(this.viewMatrix, eyeVec, refVec, upVec);
+        mat4.lookAt(this.viewMatrix, eyeVec, refVec, this.upVec);
 
-        let viewMatrixLocation = this.webGL.getUniformLocation(shaderProgram.getProgram(), "u_viewMatrix");
-        this.webGL.uniformMatrix4fv(viewMatrixLocation, false, this.viewMatrix);
+        this.viewMatrixLocation = this.webGL.getUniformLocation(shaderProgram.getProgram(), "u_viewMatrix");
+        this.webGL.uniformMatrix4fv(this.viewMatrixLocation, false, this.viewMatrix);
 
         
         this.projectionMatrix = mat4.create();
         mat4.perspective(this.projectionMatrix, FOVRad, aspectRatio, near, far);
 
-        let projectionMatrixLocation = this.webGL.getUniformLocation(shaderProgram.getProgram(), "u_projectionMatrix");
-        this.webGL.uniformMatrix4fv(projectionMatrixLocation, false, this.projectionMatrix);
+        this.projectionMatrixLocation = this.webGL.getUniformLocation(shaderProgram.getProgram(), "u_projectionMatrix");
+        this.webGL.uniformMatrix4fv(this.projectionMatrixLocation, false, this.projectionMatrix);
+    }
+
+    update(eyeVec, refVec) {
+        console.log("tries to update");
+        this.eyeVec = eyeVec;
+        this.refVec = refVec;
+
+        mat4.lookAt(this.viewMatrix, eyeVec, refVec, this.upVec);
+        this.viewMatrixLocation = this.webGL.getUniformLocation(this.shaderProgram.getProgram(), "u_viewMatrix");
+        this.webGL.uniformMatrix4fv(this.viewMatrixLocation, false, this.viewMatrix);
+
+        mat4.perspective(this.projectionMatrix, this.FOVRad, this.aspectRatio, this.near, this.far);
+        this.projectionMatrixLocation = this.webGL.getUniformLocation(this.shaderProgram.getProgram(), "u_projectionMatrix");
+        this.webGL.uniformMatrix4fv(this.projectionMatrixLocation, false, this.projectionMatrix);
+    }
+
+    getEyePos() {
+        return this.eyeVec;
     }
 }

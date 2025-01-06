@@ -7,10 +7,14 @@
     uniform mat4 u_viewMatrix;
     uniform mat4 u_projectionMatrix;
     uniform mat4 u_transformationMatrix;
-    attribute vec4 a_pos;
+    attribute vec3 a_pos;
+    attribute vec3 a_normal;
+    varying vec3 v_normal;
     varying float v_cameraDist;
     void main() {
-        gl_Position = u_projectionMatrix * u_viewMatrix * u_transformationMatrix * a_pos;
+        vec4 pos = vec4(a_pos, 1.0);
+        gl_Position = u_projectionMatrix * u_viewMatrix * u_transformationMatrix * pos;
+        v_normal = normalize(a_normal);
         v_cameraDist = sqrt(pow(gl_Position.x, 2.0) + pow(gl_Position.y, 2.0) + pow(gl_Position.z, 2.0));
     }
 </script>
@@ -19,8 +23,14 @@
     precision mediump float;
     uniform vec4 u_colour;
     varying float v_cameraDist;
+    varying vec3 v_normal;
     void main() {
-        gl_FragColor = vec4(u_colour[0]*2.0/v_cameraDist, u_colour[1]*2.0/v_cameraDist, u_colour[2]*2.0/v_cameraDist, u_colour[3]);
+        float colourExtra;
+        colourExtra = 0.0;
+        if (v_normal == vec3(1, 2, 3)) {
+            colourExtra = colourExtra + 0.1;
+        }
+        gl_FragColor = vec4(u_colour[0]*2.0/v_cameraDist, u_colour[1]*2.0/v_cameraDist, u_colour[2]*2.0/v_cameraDist, u_colour[3]-colourExtra);
     }
 </script>
 
@@ -42,6 +52,10 @@
 <script type="text/javascript" src="monochromeMaterial.js"></script>
 <script type="text/javascript" src="cone.js"></script>
 <script type="text/javascript" src="cuboid.js"></script>
+<script type="text/javascript" src="torus.js"></script>
+<script type="text/javascript" src="cylinder.js"></script>
+<script type="text/javascript" src="sphere.js"></script>
+<script type="text/javascript" src="star.js"></script>
 <script type="text/javascript" src="graphicsNode.js"></script>
 <script type="text/javascript" src="camera.js"></script>
 <script type="text/javascript" src="main.js"></script>

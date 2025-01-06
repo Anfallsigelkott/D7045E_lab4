@@ -21,7 +21,6 @@ class Cone extends Mesh{
         var n2 = radius/normallength; 
         var du = 2*Math.PI / slices;
         var kv = 0;
-        var kt = 0;
         var k = 0;
         var i,j,u;
         for (j = 0; j < fractions.length; j++) {
@@ -37,8 +36,6 @@ class Cone extends Mesh{
               normals[kv++] = s*n1;
               vertices[kv] = h1;
               normals[kv++] = n2;
-              texCoords[kt++] = (i+uoffset)/slices;
-              texCoords[kt++] = fractions[j];
            }
         }
         var k = 0;
@@ -65,8 +62,6 @@ class Cone extends Mesh{
            normals[kv++] = s*n1;
            vertices[kv] = height/2;
            normals[kv++] = n2;
-           texCoords[kt++] = (i+0.5)/slices;
-           texCoords[kt++] = 1;
         }
         for (i = 0; i < slices; i++) {
            indices[k++] = start+i;
@@ -81,8 +76,6 @@ class Cone extends Mesh{
            normals[kv++] = 0;
            vertices[kv] = -height/2;
            normals[kv++] = -1;
-           texCoords[kt++] = 0.5;
-           texCoords[kt++] = 0.5; 
            for (i = 0; i <= slices; i++) {
               u = 2*Math.PI - i*du;
               var c = Math.cos(u);
@@ -93,8 +86,6 @@ class Cone extends Mesh{
               normals[kv++] = 0;
               vertices[kv] = -height/2;
               normals[kv++] = -1;
-              texCoords[kt++] = 0.5 - 0.5*c;
-              texCoords[kt++] = 0.5 + 0.5*s;
            }
            for (i = 0; i < slices; i++) {
               indices[k++] = startIndex;
