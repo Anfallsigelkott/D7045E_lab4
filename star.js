@@ -15,12 +15,9 @@ class Star extends Mesh{
             if (i%2 == 0){
                 dist = outerdist;
             }
-            console.log("X angle: ", angle, " dist: ", dist, " multiplied angle: ", Math.cos(angle));
             let x_comp = dist*Math.cos(angle);
-            console.log("Y angle: ", angle, " dist: ", dist, " multiplied angle: ", Math.sin(angle));
             let y_comp = dist*Math.sin(angle);
             vertices.push([x_comp,y_comp,0]);
-            console.log("Coords: ", x_comp,y_comp,0);
         }
 
         function normal(tri1, tri2, tri3){
@@ -46,7 +43,6 @@ class Star extends Mesh{
             indices.push(1,i,next);
             normals.push(normal(vertices[1], vertices[i], vertices[next]));
         }
-        console.log("Vertex length: ", vertices.flat().length, " Index length: ", indices.length, " Normal length: ", normals.flat().length);
         super(webGL, new Float32Array(vertices.flat()), new Uint16Array(indices), new Float32Array(normals.flat()), shaderPgm);
     }
 }

@@ -67,8 +67,8 @@ class Cuboid extends Mesh {
         face( [-s,-s,-s, s,-s,-s, s,-s,s, -s,-s,s], [0,-1,0] );
         face( [s,-s,-s, s,s,-s, s,s,s, s,-s,s], [1,0,0] );
         face( [-s,-s,-s, -s,-s,s, -s,s,s, -s,s,-s], [-1,0,0] );*/
-        console.log("coords length: ", vertices.flat().length);
-        console.log("Indices length: ", indices.length);
+        //console.log("coords length: ", vertices.flat().length);
+        //console.log("Indices length: ", indices.length);
         super(webGL, new Float32Array(vertices.flat()), new Uint16Array(indices), new Float32Array(normals), shaderPgm);
         this.x = x;
         this.y = y;

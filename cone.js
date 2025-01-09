@@ -99,8 +99,8 @@ class Cone extends Mesh{
             vertexTextureCoords: texCoords,
             indices: indices
         };*/
-        console.log("Vertices: ", vertices);
-        console.log("Indices: ", indices);
+        //console.log("Vertices: ", vertices);
+        //console.log("Indices: ", indices);
         super(webGL, vertices, indices, normals, shaderPgm);
     }
 }

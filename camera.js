@@ -25,7 +25,6 @@ class Camera {
     }
 
     update(eyeVec, refVec) {
-        console.log("tries to update");
         this.eyeVec = eyeVec;
         this.refVec = refVec;
 
@@ -40,5 +39,9 @@ class Camera {
 
     getEyePos() {
         return this.eyeVec;
+    }
+
+    getRef() {
+        return this.refVec;
     }
 }
