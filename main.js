@@ -21,9 +21,9 @@ let frameTime;
 let cameraVelocityLeftRight = 0.0;
 let cameraVelocityUpDown = 0.0;
 let cameraVelocityForwardBackward = 0.0;
-let cameraAngleLeftRight = 0.0;
-let cameraAngleUpDown = 0.0;
-let cameraSpeed = 0.0;
+//let cameraAngleLeftRight = 0.0;
+///let cameraAngleUpDown = 0.0;
+//let cameraSpeed = 0.0;
 
 function init(){
     try {
@@ -51,19 +51,19 @@ function init(){
 
     let eye = [0, 0, 5];
     let reference = [0, 0, 0];
-    camera = new Camera(eye, reference, 1.7853981634, (canvas.width/canvas.height), 1, 100, shaderPgm, webGL);
+    camera = new Camera(eye, reference, 0.7853981634, (canvas.width/canvas.height), 1, 100, shaderPgm, webGL);
     
     let blueMono = new MonochromeMaterial(webGL, shaderPgm, [0, 0.3, 1, 1.0]);
     let greenMono = new MonochromeMaterial(webGL, shaderPgm, [0.28, 0.74, 0.15, 1.0]);
 
-    let playerCube = new Cuboid(webGL, 0.4, 0.2, 0.6, shaderPgm);
+    let playerCube = new Cuboid(webGL, 0.2, 0.2, 0.2, shaderPgm);
     let playerCone = new Cone(webGL, 1, 0.5, shaderPgm);
     let playerTorus = new Torus(webGL, 0.5/3, 0.5, shaderPgm);
     let playerCylinder = new Cylinder(webGL, 0.5, 0.7, shaderPgm);
     let playerSphere = new Sphere(webGL, 0.5, shaderPgm);
-    let playerStar = new Star(webGL, 1, 0.5, 0.5, 15);
-    let playerMatrix = [1,0,0,0, 0,1,0,0, 0,0,1,-1, 0,0,0,1]; // Identity matrix
-    player = new GraphicsNode(playerStar, blueMono, playerMatrix, webGL, shaderPgm);
+    let playerStar = new Star(webGL, 1, 0.5, 0.5, 5);
+    let playerMatrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-1,1]; // Identity matrix
+    player = new GraphicsNode(playerCone, blueMono, playerMatrix, webGL, shaderPgm);
 
     
     let min = -1.5;
@@ -75,12 +75,20 @@ function init(){
     let y = Math.ceil(Math.random()*(max-min)+min);
     let z = Math.floor(Math.random()*(maxdepth-mindepth)+mindepth);
     let matrix = mat4.create();
-    mat4.translate(matrix, matrix, [x, y, z]);
-    otherStar = new GraphicsNode(playerStar, greenMono, matrix, webGL, shaderPgm);
-    let playerGraphNode = new SceneGraphNode(player);
-    let starGraphNode = new SceneGraphNode(otherStar);
-    graphicsNodes.push(playerGraphNode, starGraphNode);
-    starGraphNode.setParent(playerGraphNode);
+    mat4.translate(matrix, playerMatrix, [1, 0, 0]);
+    otherStar = new GraphicsNode(playerCube, greenMono, matrix, webGL, shaderPgm);
+    //playerConnNode.setLocalTransform(matrix);
+    graphicsNodes.push(player);
+    
+    otherStar.setParent(player);
+    camera.setParent(otherStar);
+    //playerConnNode.setParent(playerGraphNode);
+    //starGraphNode.setParent(playerGraphNode);
+    
+    let lightMatrix = mat4.create(); // Identity matrix + height
+    mat4.translate(lightMatrix, playerMatrix, [-1, 0, 3]);
+    let lightnode = new LightNode(webGL, shaderPgm, lightMatrix);
+    lightnode.applyLight();
 
     for (let i = 0 ; i < objAmount ; i++){
         let x = Math.floor(Math.random()*(max-min)+min);
@@ -108,7 +116,17 @@ function draw() {
     for (let i = 0; i < graphicsObjects.length; i++) {
         graphicsObjects[i].draw();
     }
+
+    player.rotateXYZ([0.01, 0, 0]);
+    otherStar.rotateXYZ([0, 0.01, 0.01]);
+    
+    let ViewProjectionMatrix = camera.getViewProjectionMatrix();
+    // Update all the world matrices
     graphicsNodes[0].updateWorldMatrix();
+    // Compute matrices for rendering
+    /*graphicsNodes.forEach(function(node){
+        mat4.multiply(node.graphicsNode.transform, ViewProjectionMatrix, node.worldMatrix);
+    });*/
     player.draw();
     otherStar.draw();
     //console.log(otherStar.transform);
@@ -143,16 +161,16 @@ window.addEventListener("keydown", function(event) {
             cameraVelocityUpDown = cameraVelocityUpDown - cameraAngularVelocityStep;
             break;
         case "ArrowLeft":
-            cameraVelocityLeftRight = cameraVelocityLeftRight - cameraAngularVelocityStep;
-            break;
-        case "ArrowRight":
             cameraVelocityLeftRight = cameraVelocityLeftRight + cameraAngularVelocityStep;
             break;
+        case "ArrowRight":
+            cameraVelocityLeftRight = cameraVelocityLeftRight - cameraAngularVelocityStep;
+            break;
         case "PageUp":
-            cameraVelocityForwardBackward = cameraVelocityForwardBackward + cameraTranslationalVelocityStep;
+            cameraVelocityForwardBackward = cameraVelocityForwardBackward - cameraTranslationalVelocityStep;
             break;
         case "PageDown":
-            cameraVelocityForwardBackward = cameraVelocityForwardBackward - cameraTranslationalVelocityStep;
+            cameraVelocityForwardBackward = cameraVelocityForwardBackward + cameraTranslationalVelocityStep;
             break;
         case "End":
             cameraVelocityUpDown = 0;
@@ -162,9 +180,9 @@ window.addEventListener("keydown", function(event) {
 
     }
     //console.log(cameraPos);
-    player.update(xyz);
+    player.updatexyz(xyz);
     //console.log(player.transform);
-    console.log(cameraVelocityUpDown, cameraVelocityLeftRight, cameraVelocityForwardBackward, cameraAngleLeftRight, cameraAngleUpDown);
+    //console.log(cameraVelocityUpDown, cameraVelocityLeftRight, cameraVelocityForwardBackward);
     draw();
 });
 
@@ -174,31 +192,82 @@ function animate() {
 
     let cameraPos = camera.getEyePos();
     let cameraRef = camera.getRef();
+    let cameraUp = camera.getUp();
 
-    cameraAngleLeftRight = cameraAngleLeftRight + cameraVelocityLeftRight * deltaTime;
-    cameraAngleUpDown = cameraAngleUpDown + cameraVelocityUpDown * deltaTime;
+    let cameraAngleLeftRight = cameraVelocityLeftRight * deltaTime;
+    let cameraAngleUpDown = cameraVelocityUpDown * deltaTime;
+    let cameraSpeed = cameraVelocityForwardBackward * deltaTime;
 
-    let newEyeX = cameraVelocityForwardBackward * Math.cos(cameraAngleLeftRight) * Math.sin(cameraAngleUpDown);
-    let newEyeY = cameraVelocityForwardBackward * Math.sin(cameraAngleLeftRight) * Math.sin(cameraAngleUpDown);
-    let newEyeZ = cameraVelocityForwardBackward * Math.cos(cameraAngleUpDown);
+    // Calculate the forward-backward camera axis
+    let n = [0, 0, 0];
+    vec3.subtract(n, cameraPos, cameraRef); // n = eye - ref
+    vec3.normalize(n, n);
 
-    let newRefX = (cameraVelocityForwardBackward+1) * Math.cos(cameraAngleLeftRight) * Math.sin(cameraAngleUpDown);
-    let newRefY = (cameraVelocityForwardBackward+1) * Math.sin(cameraAngleLeftRight) * Math.sin(cameraAngleUpDown);
-    let newRefZ = (cameraVelocityForwardBackward+1) * Math.cos(cameraAngleUpDown);
+    // Calculate the left-right camera axis
+    let u = [0, 0, 0];
+    vec3.cross(u, cameraUp, n);
+    vec3.normalize(u, u);
 
-    cameraRef[0] = cameraPos[0] + newRefX;
-    cameraRef[1] = cameraPos[1] + newRefY;
-    cameraRef[2] = cameraPos[2] + newRefZ;
+    // Move the ref point to the origin so we can rotate it
+    let newRef = [0, 0, 0];
+    vec3.subtract(newRef, cameraRef, cameraPos);
 
-    cameraPos[0] = cameraPos[0] + newEyeX;
-    cameraPos[1] = cameraPos[1] + newEyeY;
-    cameraPos[2] = cameraPos[2] + newEyeZ;
+    // Create a rotation transform around the left-right camera axis
+    tiltRotation = mat4.create();
+    mat4.rotate(tiltRotation, tiltRotation, cameraAngleUpDown, u);
 
+    // Create a rotation transform around the up-down camera axis
+    panRotation = mat4.create();
+    mat4.rotate(panRotation, panRotation, cameraAngleLeftRight, cameraUp);
 
-    camera.update(cameraPos, cameraRef);
+    // Rotate the center point by the rotation matrices
+    vec3.transformMat4(newRef, newRef, tiltRotation);
+    vec3.transformMat4(newRef, newRef, panRotation);
 
-    console.log("Eye: ", cameraPos);
-    console.log("Ref: ", cameraRef);
+    // Translate the ref back to the camera
+    vec3.add(cameraRef, newRef, cameraPos);
+
+    // If the angle between the line-of-sight and the "up vector" is less
+    // than 10 degrees or greater than 170 degrees, then rotate the
+    // "up_vector" about the left-right axis.
+    // cos(10 degrees) = 0.985; cos(170 degrees) = -0.985
+    if (Math.abs(vec3.dot(n, cameraUp))) {
+        vec3.transformMat4(cameraUp, cameraUp, tiltRotation);
+    }
+
+    // TRANSFORMATION
+    // Calculate the forward-backward camera axis
+    vec3.subtract(n, cameraPos, cameraRef); // n = eye - ref
+    vec3.normalize(n, n);
+
+    // Scale the vector
+    vec3.scale(n, n, cameraSpeed);
+
+    vec3.add(cameraRef, cameraRef, n);
+    vec3.add(cameraPos, cameraPos, n);
+
+    camera.update(cameraPos, cameraRef, cameraUp);
+
+    let angularDrag = cameraAngularVelocityStep/100;
+    let translationalDrag = cameraTranslationalVelocityStep/100;
+    if (cameraVelocityLeftRight > 0) {
+        cameraVelocityLeftRight = cameraVelocityLeftRight - angularDrag;
+    } 
+    if (cameraVelocityLeftRight < 0) {
+        cameraVelocityLeftRight = cameraVelocityLeftRight + angularDrag;
+    } 
+    if (cameraVelocityUpDown > 0) {
+        cameraVelocityUpDown = cameraVelocityUpDown - angularDrag;
+    } 
+    if (cameraVelocityUpDown < 0) {
+        cameraVelocityUpDown = cameraVelocityUpDown + angularDrag;
+    } 
+    if (cameraVelocityForwardBackward > 0) {
+        cameraVelocityForwardBackward = cameraVelocityForwardBackward - translationalDrag;
+    }
+    if (cameraVelocityForwardBackward < 0) {
+        cameraVelocityForwardBackward = cameraVelocityForwardBackward + translationalDrag;
+    }
 
     draw();
     requestAnimationFrame(animate);

@@ -43,6 +43,14 @@ class Cuboid extends Mesh {
          face( [-x,-y,-z, x,-y,-z, x,-y,z, -x,-y,z], [0,-1,0] );
          face( [x,-y,-z, x,y,-z, x,y,z, x,-y,z], [1,0,0] );
          face( [-x,-y,-z, -x,-y,z, -x,y,z, -x,y,-z], [-1,0,0] );
+
+
+
+
+
+
+
+
         /*
         var s =  1/2;
         var coords = [];

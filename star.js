@@ -43,6 +43,6 @@ class Star extends Mesh{
             indices.push(1,i,next);
             normals.push(normal(vertices[1], vertices[i], vertices[next]));
         }
-        super(webGL, new Float32Array(vertices.flat()), new Uint16Array(indices), new Float32Array(normals.flat()), shaderPgm);
+        super(webGL, new Float32Array(vertices.flat()), new Uint16Array(indices.flat()), new Float32Array(normals.flat()), shaderPgm);
     }
 }

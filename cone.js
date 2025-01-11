@@ -1,6 +1,6 @@
 class Cone extends Mesh{
     constructor(webGL, height, radius, shaderPgm){
-        let noBottom = true;
+        let noBottom = false;
         let slices = 32;
         radius = radius || 0.5;
         height = height || 2*radius;

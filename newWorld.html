@@ -10,27 +10,48 @@
     attribute vec3 a_pos;
     attribute vec3 a_normal;
     varying vec3 v_normal;
-    varying float v_cameraDist;
+    varying vec3 v_cameraPos;
+    //varying float v_cameraDist;
     void main() {
         vec4 pos = vec4(a_pos, 1.0);
         gl_Position = u_projectionMatrix * u_viewMatrix * u_transformationMatrix * pos;
-        v_normal = normalize(a_normal);
-        v_cameraDist = sqrt(pow(gl_Position.x, 2.0) + pow(gl_Position.y, 2.0) + pow(gl_Position.z, 2.0));
+        v_normal = normalize(mat3(u_transformationMatrix) * a_normal.xyz);
+        v_cameraPos = (u_transformationMatrix * pos).xyz;
+        //v_cameraDist = sqrt(pow(gl_Position.x, 2.0) + pow(gl_Position.y, 2.0) + pow(gl_Position.z, 2.0));
     }
 </script>
 
 <script id="fragment_shader" type="x-shader/x-fragment">
     precision mediump float;
     uniform vec4 u_colour;
-    varying float v_cameraDist;
+    uniform vec4 u_lightPosition;
+    uniform vec4 u_diffuseColour;
+    uniform vec4 u_ambientColour;
+    uniform float u_specularExponent;
+    uniform vec3 u_specularColour;
+    varying vec3 v_cameraPos;
     varying vec3 v_normal;
+    //varying float v_cameraDist;
     void main() {
-        float colourExtra;
+        /*float colourExtra;
         colourExtra = 0.0;
         if (v_normal == vec3(1, 2, 3)) {
             colourExtra = colourExtra + 0.1;
         }
-        gl_FragColor = vec4(u_colour[0]*2.0/v_cameraDist, u_colour[1]*2.0/v_cameraDist, u_colour[2]*2.0/v_cameraDist, u_colour[3]-colourExtra);
+        gl_FragColor = vec4(u_colour[0]*2.0/v_cameraDist, u_colour[1]*2.0/v_cameraDist, u_colour[2]*2.0/v_cameraDist, u_colour[3]-colourExtra);*/
+
+        
+        // This code has been adapted from Ecks book
+        vec3 L, R, N, V;
+        L = normalize(u_lightPosition.xyz / u_lightPosition.w - v_cameraPos);
+        N = normalize(v_normal);
+        R = reflect(-L, N);
+        V = normalize(-v_cameraPos);
+        
+        vec3 reflection = (1.0 - max(dot(L, N), 0.0)) * u_ambientColour.rgb + max(dot(L, N), 0.0) * u_diffuseColour.rgb;
+        float factor = pow(max(dot(R, V), 0.0), u_specularExponent);
+        reflection += factor * u_specularColour.rgb;
+        gl_FragColor = vec4(reflection, 1.0) * u_colour;
     }
 </script>
 
@@ -58,6 +79,7 @@
 <script type="text/javascript" src="sphere.js"></script>
 <script type="text/javascript" src="star.js"></script>
 <script type="text/javascript" src="graphicsNode.js"></script>
+<script type="text/javascript" src="lightNode.js"></script>
 <script type="text/javascript" src="camera.js"></script>
 <script type="text/javascript" src="main.js"></script>
 

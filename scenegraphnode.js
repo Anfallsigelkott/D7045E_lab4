@@ -1,8 +1,12 @@
 class SceneGraphNode {
-    constructor(graphicsnode){
-        this.graphicsNode = graphicsnode;
+    constructor(localTransform){
+        if (localTransform) {
+            this.localTransform = localTransform;
+        } else {
+            this.localTransform = mat4.create();
+        }
+        this.worldTransform = mat4.create();
         this.children = [];
-        this.worldMatrix = mat4.create();
     }
 
     setParent(parent){
@@ -20,19 +24,32 @@ class SceneGraphNode {
     }
 
     updateWorldMatrix(parentWorldMatrix) {
-        if (parentWorldMatrix) {
-            mat4.multiply(this.worldMatrix, parentWorldMatrix, this.graphicsNode.transform);
+
+        /*if (parentWorldMatrix) {
+            mat4.translate(this.graphicsNode.worldTransform, this.graphicsNode.getLocalTransform(), parentWorldMatrix);
         } else {
-            mat4.copy(this.worldMatrix, this.graphicsNode.transform);
+            mat4.copy(this.graphicsNode.worldTransform, this.graphicsNode.getLocalTransform());
         }
 
-        var worldMatrix = this.worldMatrix;
+        let parentVector = [this.graphicsNode.worldTransform[12], this.graphicsNode.worldTransform[13], this.graphicsNode.worldTransform[14]];
         this.children.forEach(function(child) {
+            child.updateWorldMatrix(parentVector);
+        });*/
+        if (parentWorldMatrix) {
+            mat4.multiply(this.worldTransform, parentWorldMatrix, this.localTransform);
+        } else { 
+            mat4.copy(this.worldTransform, this.localTransform);
+        }
+        let worldMatrix = this.worldTransform;
+        
+        this.children.forEach(function(child) {
+            console.log("gets here (nodeless with parent)");
             child.updateWorldMatrix(worldMatrix);
         });
     }
 
-    getGraphicsNode(){
-        return this.graphicsNode;
+    // For setting the local transform of objects without a graphicsnode
+    setLocalTransform(localTransform){
+        this.localTransform = localTransform;
     }
 }
