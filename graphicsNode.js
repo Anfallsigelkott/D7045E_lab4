@@ -36,21 +36,8 @@ class GraphicsNode extends SceneGraphNode{
         this.webGL.drawElements(this.webGL.TRIANGLES, indexLen, this.webGL.UNSIGNED_SHORT, 0);
     }
 
-    updatexyz(transformVector) {
-        //let transformMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, transformVector[0], transformVector[1], transformVector[2], 1];
-        //mat4.multiply(this.localTransform, this.localTransform, transformMatrix);
-        mat4.translate(this.localTransform, this.localTransform, transformVector);
-    }
-
-    rotateXYZ(rotationVector) {
-        let savedPosition = [this.localTransform[12], this.localTransform[13], this.localTransform[14]];
-        //mat4.translate(this.localTransform, this.localTransform, [-savedPosition[0], -savedPosition[1], -savedPosition[2]]);
-
-        mat4.rotateX(this.localTransform, this.localTransform, rotationVector[0]);
-        mat4.rotateY(this.localTransform, this.localTransform, rotationVector[1]);
-        mat4.rotateZ(this.localTransform, this.localTransform, rotationVector[2]);
-
-        //mat4.translate(this.localTransform, this.localTransform, savedPosition);
+    scaleXYZ(scaleVector) {
+        mat4.scale(this.localTransform, this.localTransform, scaleVector);
     }
 
     getLocalTransform() {
